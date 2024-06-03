@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webshop - Kosár</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">Webshop</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">Főoldal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="products.html">Termékek</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="form.html">Kosár</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Cart and Form -->
+    <div class="container mt-5">
+        <h2>Kosár</h2>
+        <div id="cart"></div>
+        <button class="btn btn-primary mt-3" onclick="updateCart()">Kosár frissítése</button>
+
+        <h2 class="mt-5">Űrlap</h2>
+        <form id="orderForm">
+            <div class="form-group">
+                <label for="name">Név</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="address">Lakcím</label>
+                <input type="text" class="form-control" id="address" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telefonszám</label>
+                <input type="tel" class="form-control" id="phone" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Beküldés</button>
+        </form>
+        <div id="successMessage" class="alert alert-success mt-3" style="display:none;">
+            A rendelés sikeresen beküldve!
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+            function renderCart() {
+                const cartContainer = document.getElementById('cart');
+                cartContainer.innerHTML = '';
+                if (cart.length === 0) {
+                    cartContainer.innerHTML = '<p>A kosár üres.</p>';
+                    return;
+                }
+
+                let total = 0;
+                const table = document.createElement('table');
+                table.className = 'table';
+
+                const thead = document.createElement('thead');
+                thead.innerHTML = '<tr><th>Termék</th><th>Ár</th><th>Darabszám</th><th>Összeg</th><th></th></tr>';
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                cart.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td>${item.price} Ft</td>
+                        <td>
+                            <input type="number" class="form-control quantity" data-index="${index}" value="${item.quantity}" min="1">
+                        </td>
+                        <td>${item.price * item.quantity} Ft</td>
+                        <td><button class="btn btn-danger btn-sm remove-item" data-index="${index}">Eltávolítás</button></td>
+                    `;
+                    tbody.appendChild(row);
+                    total += item.price * item.quantity;
+                });
+                table.appendChild(tbody);
+
+                const tfoot = document.createElement('tfoot');
+                tfoot.innerHTML = `<tr><td colspan="3"><strong>Összesen</strong></td><td><strong>${total} Ft</strong></td><td></td></tr>`;
+                table.appendChild(tfoot);
+
+                cartContainer.appendChild(table);
+
+                document.querySelectorAll('.quantity').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const index = this.getAttribute('data-index');
+                        cart[index].quantity = parseInt(this.value);
+                        updateCart();
+                    });
+                });
+
+                document.querySelectorAll('.remove-item').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        cart.splice(index, 1);
+                        updateCart();
+                    });
+                });
+            }
+
+            function updateCart() {
+                localStorage.setItem('cart', JSON.stringify(cart));
+                renderCart();
+            }
+
+            renderCart();
+
+            document.getElementById('orderForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                // Process the order here, e.g., send to server...
+
+                // Show success message
+                document.getElementById('successMessage').style.display = 'block';
+
+                // Clear cart
+                cart = [];
+                localStorage.removeItem('cart');
+                renderCart();
+            });
+        });
+    </script>
+</body>
+</html>

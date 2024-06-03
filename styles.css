@@ -1,0 +1,35 @@
+body {
+    background-color: rgb(213, 254, 254);
+}
+
+h2 {
+    color: #343a40;
+}
+
+p, ul, li {
+    color: #495057;
+}
+
+.card {
+    margin-bottom: 20px;
+    background-color: rgb(213, 254, 254);
+}
+
+.carousel-img {
+    height: 450px;
+    object-fit: cover;
+}
+
+ul a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+ul a:hover {
+    text-decoration: underline;
+}
+
+.color
+{
+ 
+}
